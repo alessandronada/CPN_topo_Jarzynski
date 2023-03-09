@@ -28,6 +28,17 @@ void parallel_tempering_with_hierarchic_update(CPN_Conf * conf, Rectangle const 
 		conf[i].update_index++;
 	}
 }
+
+void single_conf_hierarchic_update(CPN_Conf * conf, Rectangle const * const most_update, CPN_Param const * const param,	Geometry const * const geo, RNG_Param *rng_state)
+{
+	int begin_hierarc_level=0;
+	/*------- Single parallel tempering step -------*/
+	update_with_defect(&(conf[0]), geo, param, rng_state);
+	if ( param->d_N_hierarc_levels > 0 )
+	{
+		single_conf_hierarchic_update_rectangle(conf, geo, param, 0, begin_hierarc_level, most_update, rng_state);
+	}
+}
 	
 // perform a hierarchic update on rectangles for conf[conf_label]
 void hierarchic_update_rectangle(CPN_Conf * conf, Geometry const * const geo, CPN_Param const * const param, int const conf_label, int const hierarc_level,
@@ -51,6 +62,27 @@ void hierarchic_update_rectangle(CPN_Conf * conf, Geometry const * const geo, CP
 			if(param->d_N_replica_pt>1) swap(conf, param, swap_counter, rng_state);
 			conf_translation(&(conf[0]), geo, param, aux_conf, rng_state);
 			hierarchic_update_rectangle(conf, geo, param, conf_label, (hierarc_level+1), most_update, swap_counter, aux_conf, rng_state);
+		}
+	} // end else
+}
+
+void single_conf_hierarchic_update_rectangle(CPN_Conf * conf, Geometry const * const geo, CPN_Param const * const param, int const conf_label, int const hierarc_level,
+                                 Rectangle const * const most_update, RNG_Param *rng_state)
+{
+	int j;
+	if(hierarc_level==((param->d_N_hierarc_levels)-1))
+	{
+		for(j=0;j<param->d_N_sweep_rect[hierarc_level];j++) 
+		{
+			update_rectangle(&(conf[conf_label]), geo, param, &(most_update[hierarc_level]), rng_state);
+		}
+	} // end if
+	else
+	{
+		for(j=0;j<param->d_N_sweep_rect[hierarc_level];j++)
+		{
+			update_rectangle(&(conf[conf_label]), geo, param, &(most_update[hierarc_level]), rng_state);
+			single_conf_hierarchic_update_rectangle(conf, geo, param, conf_label, (hierarc_level+1), most_update, rng_state);
 		}
 	} // end else
 }
@@ -366,6 +398,20 @@ void swap_conf(CPN_Conf * conf,  CPN_Param const * const param, int const r, int
 		conf[r].conf_label=conf[s].conf_label;
 		conf[s].conf_label=aux_label;
 	}
+}
+
+double compute_W(CPN_Conf * conf,  CPN_Param const * const param, int const r, double deltaC)
+{
+        long n;
+	double E=0.0;
+
+	// compute the action just along the defect or in the near-neighbors of it  
+	for(n=0;n<param->d_L_defect;n++)
+	{
+		E+=swap_energy_contribution(&(conf[r]), param, n);
+	}
+
+	return (-2 * (param->d_beta) * ((double)N)) * deltaC * E; // log of the metropolis swap probability p
 }
 	
 // compute contributions to energy difference for swap probability and site x = (x_0=L-1, x_1=n) (L = d_size[0]) and for links along mu=0

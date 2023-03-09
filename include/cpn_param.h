@@ -23,6 +23,11 @@ typedef struct CPN_Param {
 	int d_L_defect;			// defect length along the x direction;
 	int d_N_replica_pt;		// numbers of replica used in parallel tempering
 	
+	// Jarzynksi parameters
+	int d_J_evolutions;             // number of non-equilibrium evolutions
+	int d_J_steps;                  // number of intermediate steps in non-equilibrium evolution
+	int d_J_relax;                    // number of updates between two non-equilibrium evolutions
+	
 	// hierarchical update (parallel tempering)
 	int d_N_hierarc_levels;	// number of hierarchical levels
 	int *d_L_rect;			// d_L_rect is a vector of length d_N_hierarc_levels
@@ -60,6 +65,7 @@ typedef struct CPN_Param {
 	char d_conf_file[STD_STRING_LENGTH];				// conf file name
 	char d_data_file[STD_STRING_LENGTH];				// non-topo data file name
 	char d_topo_file[STD_STRING_LENGTH];				// topo data file name
+	char d_work_file[STD_STRING_LENGTH];				// work data file name
 	char d_log_file[STD_STRING_LENGTH];					// log file name
 	char d_swap_accept_file[STD_STRING_LENGTH];			// swap acceptances file
 	char d_swap_tracking_file[STD_STRING_LENGTH];		// swap history file
@@ -78,6 +84,7 @@ void init_derived_constants(CPN_Param *);
 void free_param(CPN_Param *);
 void init_data_file(FILE **, CPN_Param const * const);
 void init_topo_file(FILE **, CPN_Param const * const);
+void init_work_file(FILE **, CPN_Param const * const);
 void print_simulation_details_cpn(char const * const, CPN_Param const * const, time_t const * const, time_t const * const, clock_t const, clock_t const);
 void print_simulation_details_multicanonic_cpn(char const * const, CPN_Param const * const, time_t const * const, time_t const * const, clock_t const, clock_t const);
 

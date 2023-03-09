@@ -1,6 +1,7 @@
 bin_PROGRAMS = cpn \
                multicanonic_cpn \
-               cpn_conf_check
+               cpn_conf_check \
+               cpn_jarzynski
 
 cpn_conf = ./include/cpn_cmplx_op.h \
            ./lib/cpn_cmplx_op.c \
@@ -25,6 +26,14 @@ endianness = ./include/endianness.h \
              ./lib/endianness.c
 
 cpn_SOURCES = ./src/cpn.c \
+              ./include/macro.h \
+              ${rng} \
+              ${cpn_conf} \
+              ${cpn_param} \
+              ${geometry} \
+              ${endianness}
+
+cpn_jarzynski_SOURCES = ./src/cpn_jarzynski.c \
               ./include/macro.h \
               ${rng} \
               ${cpn_conf} \

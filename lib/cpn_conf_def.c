@@ -49,16 +49,16 @@ void allocate_CPN_conf(CPN_Conf *conf, CPN_Param const * const param)
 	int err;
 	err=posix_memalign((void**) &(conf->z), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(cmplx *));
 	if(err!=0)
-    {
+        {
 		fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
 		exit(EXIT_FAILURE);
-    }
+        }
 	err=posix_memalign((void**) &(conf->U), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(cmplx *));
 	if(err!=0)
-    {
+        {
 		fprintf(stderr, "Problems in allocating the lattice! (%s, %d)\n", __FILE__, __LINE__);
 		exit(EXIT_FAILURE);
-    }
+        }
 	for(i=0; i<param->d_volume; i++)
 	{
 		err=posix_memalign((void**) &(conf->z[i]), (size_t) DOUBLE_ALIGN, (size_t) N * sizeof(cmplx));
@@ -144,6 +144,26 @@ void init_bound_cond(CPN_Conf *conf, int const a, CPN_Param const * const param)
 			// if mu=0, modify boundary conditions on the defect if more than 1 replica is used
 			if ( (param->d_N_replica_pt>1) && (mu==0) && (is_on_defect(i, param) == 0) )
 				conf->C[i][mu] -= (((double)(a))/(((double)(param->d_N_replica_pt-1)))); // C = 1 - a / (N_replica - 1)
+		}
+	}
+}
+
+// change of the defect
+void set_bound_cond(CPN_Conf *conf, double const newC, CPN_Param const * const param)
+{
+	int mu;
+	long i;
+
+	//change of C[r][mu]
+	for(i=0; i<param->d_volume; i++)
+	{
+		for(mu=0; mu<2; mu++)
+		{
+			conf->C[i][mu]=1.0;
+			// defect affects link along the mu=0 direction being set along the mu=1 direction
+			// if mu=0, modify boundary conditions on the defect if more than 1 replica is used
+			if ( (mu==0) && (is_on_defect(i, param) == 0) )
+				conf->C[i][mu] = 1.0 - newC; // C = 1 - j / N_steps
 		}
 	}
 }

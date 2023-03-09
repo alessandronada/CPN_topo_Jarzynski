@@ -37,6 +37,7 @@ void init_CPN_replicas(CPN_Conf **, CPN_Param const * const, RNG_Param *);
 void allocate_CPN_conf(CPN_Conf *, CPN_Param const * const);
 void init_CPN_conf(CPN_Conf *, CPN_Param const * const, char const * const, RNG_Param *); 
 void init_bound_cond(CPN_Conf *, int const, CPN_Param const * const);
+void set_bound_cond(CPN_Conf *, double const, CPN_Param const * const);
 int is_on_defect(long const, CPN_Param const * const);
 void normalize_replicas(CPN_Conf *, CPN_Param const * const); 
 void normalize_CPN_conf(CPN_Conf *, CPN_Param const * const);
@@ -52,6 +53,7 @@ void free_CPN_conf(CPN_Conf *, CPN_Param const * const);
 
 // in lib/cpn_meas.c
 void perform_measures_localobs(CPN_Conf  * , Geometry const * const, CPN_Param const * const, FILE *, FILE *, CPN_Conf *);
+void print_work(CPN_Conf *, double, FILE *);
 cmplx plaquette(CPN_Conf const * const, Geometry const * const, long const, int const mu, int const nu);
 double energy_density(CPN_Conf const * const, Geometry const * const, CPN_Param const * const);
 double geo_topo_charge_z_density(CPN_Conf const * const, Geometry const * const, long const);
@@ -65,8 +67,11 @@ void cooling(CPN_Conf *, Geometry const * const, CPN_Param const * const);
 // in lib/cpn_update.c
 void parallel_tempering_with_hierarchic_update(CPN_Conf *, Rectangle const * const, Acc_Swap *,
                                                CPN_Param const * const, Geometry const * const, CPN_Conf *, RNG_Param *);
+void single_conf_hierarchic_update(CPN_Conf *, Rectangle const * const, CPN_Param const * const, Geometry const * const, RNG_Param *);
 void hierarchic_update_rectangle(CPN_Conf *, Geometry const * const, CPN_Param const * const, int const, int const,
                                  Rectangle const * const, Acc_Swap *, CPN_Conf *, RNG_Param *);
+void single_conf_hierarchic_update_rectangle(CPN_Conf *, Geometry const * const, CPN_Param const * const, int const, int const,
+                                 Rectangle const * const, RNG_Param *);
 void update_rectangle(CPN_Conf *, Geometry const * const, CPN_Param const * const, Rectangle const * const, RNG_Param *);
 void update_with_defect(CPN_Conf *, Geometry const * const, CPN_Param const * const, RNG_Param *);
 cmplx staple_up(CPN_Conf const * const, Geometry const * const, long const, int);
@@ -84,6 +89,7 @@ void overheatbath_single_site_z(CPN_Conf *, Geometry const * const, CPN_Param co
 int metropolis_test(RNG_Param *, double const);
 void swap(CPN_Conf *, CPN_Param const * const, Acc_Swap *, RNG_Param *);
 void swap_conf(CPN_Conf *, CPN_Param const * const, int const, int const, Acc_Swap *, RNG_Param *);
+double compute_W(CPN_Conf *, CPN_Param const * const, int const, double);
 double swap_energy_contribution(CPN_Conf const * const, CPN_Param const * const, long const);
 void conf_translation(CPN_Conf *, Geometry const * const, CPN_Param const * const, CPN_Conf *, RNG_Param *);
 void print_replicas_labels(FILE *, CPN_Conf const * const, CPN_Param const * const);

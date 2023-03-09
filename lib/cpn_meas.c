@@ -59,6 +59,12 @@ void perform_measures_localobs(CPN_Conf * conf, Geometry const * const geo,
 	fflush(topofilep);
 }
 
+void print_work(CPN_Conf * conf, double work, FILE *workfilep)
+{
+        fprintf(workfilep, "%ld %.16lf\n", conf->update_index, work);
+        fflush(workfilep);
+}
+
 // compute plaquette Pi_{mu nu}(i) on site i and plane (mu,nu)
 // Pi_{mu nu}(i) = U(i)_mu U(i+mu)_nu conj( U(i+nu) )_mu conj( U(i) )_nu
 cmplx plaquette(CPN_Conf const * const conf, Geometry const * const geo, long const i, int const mu, int const nu)

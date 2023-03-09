@@ -4,11 +4,15 @@ beta   1.0      # bare inverse coupling
 theta  0.0      # bare imaginary theta
 
 # simulation details
-num_MC_step      100    # number of updating steps
-meas_every       10     # perform measures every <meas_every> steps
+num_MC_step      100    # number of updating steps (unused for Jarzynski)
+meas_every       10     # perform measures every <meas_every> steps  (unused for Jarzynski)
 num_micro        4      # number of over-relaxation steps (microcanonical steps) for every over-heat-bath step
 num_norm         3      # normalize fields every <num_norm> steps
 save_conf_every  50     # save conf for backup every <save_conf_every> steps
+
+num_Jar_ev       100     # number of non-equilibrium evolutions (Jarzynski only)
+num_Jar_steps    10     # number of non-equilibrium steps in each evolution (Jarzynski only)
+num_Jar_relax    1      # number of MC steps between non-equilibrium evolutions (Jarzynski only)
 
 start 0                 # initialize conf: 0=random cold, 1=random hot, 2=start from saved conf
 
@@ -20,19 +24,20 @@ rng_start 0             # initialize rng state: 0=std initialization, 1=read rng
 
 # Hasenbusch parallel tempering parameters
 num_replica  1    # number of replicas
-defect_size  0    # defect length
+defect_size  10    # defect length
 hierarc_upd  0    # number of hierarchic update __ rectangle sizes for each herarchic level __ number of sweeps for each hierarchic level
 
 # multicanonic parameters
 grid_step 1                      # topo potential is defined on a grid with step <grid_step>
 grid_max 100                     # topo potential is defined for Q € [ -<grid_max>, <grid_max> ], outside is just taken constant
-num_smooth_step 0                # number of smoothing steps to define topo charge in topo potential
+#num_smooth_step 0                # number of smoothing steps to define topo charge in topo potential
 num_single_site_stoc_upd 2500    # number of stochastic single sites updates
 
 # file names
 conf_file                 conf.dat                # save conf for backup
 data_file                 dati.dat                # save non-topological observables
 topo_file                 topo.dat                # save topological observables
+work_file                 work.dat                # save work (Jarzynski only)
 log_file                  my_log.dat              # save simulations details
 rng_state_file            rng_state.dat           # save rng state
 swap_acc_file             swap_acc.dat            # save swap acceptances (parallel tempering only)

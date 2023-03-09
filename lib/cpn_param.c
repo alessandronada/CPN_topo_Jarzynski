@@ -158,6 +158,36 @@ void read_input(char const * const input_file_name, CPN_Param *param)
 				}
 				param->d_measevery=temp_i;
 			}
+			else if(strncmp(str, "num_Jar_ev", 10)==0)
+			{ 
+				err=fscanf(input_fp, "%d", &temp_i);
+				if(err!=1)
+				{
+					fprintf(stderr, "Error in reading the file %s (%s, %d)\n", input_file_name, __FILE__, __LINE__);
+					exit(EXIT_FAILURE);
+				}
+				param->d_J_evolutions=temp_i;
+			}
+			else if(strncmp(str, "num_Jar_steps", 13)==0)
+			{ 
+				err=fscanf(input_fp, "%d", &temp_i);
+				if(err!=1)
+				{
+					fprintf(stderr, "Error in reading the file %s (%s, %d)\n", input_file_name, __FILE__, __LINE__);
+					exit(EXIT_FAILURE);
+				}
+				param->d_J_steps=temp_i;
+			}
+			else if(strncmp(str, "num_Jar_relax", 13)==0)
+			{ 
+				err=fscanf(input_fp, "%d", &temp_i);
+				if(err!=1)
+				{
+					fprintf(stderr, "Error in reading the file %s (%s, %d)\n", input_file_name, __FILE__, __LINE__);
+					exit(EXIT_FAILURE);
+				}
+				param->d_J_relax=temp_i;
+			}
 			else if(strncmp(str, "num_micro", 9)==0)
 			{ 
 				err=fscanf(input_fp, "%d", &temp_i);
@@ -247,6 +277,16 @@ void read_input(char const * const input_file_name, CPN_Param *param)
 					exit(EXIT_FAILURE);
 				}
 				strcpy(param->d_topo_file, temp_str);
+			}
+			else if(strncmp(str, "work_file", 9)==0)
+			{ 
+				err=fscanf(input_fp, "%s", temp_str);
+				if(err!=1)
+				{
+					fprintf(stderr, "Error in reading the file %s (%s, %d)\n", input_file_name, __FILE__, __LINE__);
+					exit(EXIT_FAILURE);
+				}
+				strcpy(param->d_work_file, temp_str);
 			}
 			else if(strncmp(str, "log_file", 8)==0)
 			{ 
@@ -464,6 +504,12 @@ void read_input(char const * const input_file_name, CPN_Param *param)
 			fprintf(stderr, "Error: all sizes have to be larger than 1 (%s, %d)\n", __FILE__, __LINE__);
 			exit(EXIT_FAILURE);
 		}
+		
+		if(param->d_N_replica_pt>1 && param->d_J_evolutions>0)
+		{
+			fprintf(stderr, "Error: num_replica parameter must be == 1 for non-equilibrium evolutions (%s, %d)\n", __FILE__, __LINE__);
+			exit(EXIT_FAILURE);
+		}
 
 		init_derived_constants(param);
 	} // closes initial if
@@ -527,6 +573,26 @@ void init_topo_file(FILE **topofilep, CPN_Param const * const param)
 	fflush(*topofilep);
 }
 
+// initialize work data file
+void init_work_file(FILE **workfilep, CPN_Param const * const param)
+{ 
+	*workfilep=fopen(param->d_work_file, "r");
+	if(*workfilep!=NULL) // file exists
+	{
+		fclose(*workfilep);
+		*workfilep=fopen(param->d_work_file, "a");
+	}
+	else
+	{
+		int mu;
+		*workfilep=fopen(param->d_work_file, "w");
+		fprintf(*workfilep, "# %f ", param->d_beta);
+		for(mu=0; mu<2; mu++) fprintf(*workfilep, "%d ", param->d_size[mu]);
+		fprintf(*workfilep, "\n");
+	}
+	fflush(*workfilep);
+}
+
 // print simulations details of cpn
 void print_simulation_details_cpn(char const * const input_file_name, CPN_Param const * const param, time_t const * const start_date, time_t const * const finish_date,
                                   clock_t const start_time, clock_t const finish_time)
@@ -572,14 +638,24 @@ void print_simulation_details_cpn(char const * const input_file_name, CPN_Param 
 			for(i=0;i<param->d_N_hierarc_levels;i++) fprintf(fp,"%d ", param->d_N_sweep_rect[i]);
 		}
 		fprintf(fp, "\n");
-	
-		if (param->d_N_replica_pt==1) fprintf(fp, "Number of standard local updating steps: %d\n", param->d_MC_step);
-		else fprintf(fp, "Number of parallel tempering steps: %d\n", param->d_MC_step);
-		fprintf(fp, "Over-relaxation/over-heat-bath ratio: %d / 1\n", param->d_num_micro);
-		fprintf(fp, "Measures taken every: %d\n", param->d_measevery);
-		fprintf(fp, "Conf normalized every: %d\n", param->d_num_norm);
-		fprintf(fp, "Conf saved every: %d\n", param->d_saveconf_backup_every);
-		fprintf(fp, "\n");
+                
+                if (param->d_J_evolutions>0)
+                {
+                        fprintf(fp, "Number of non-equilbrium evolutions: %d\n", param->d_J_evolutions);
+                        fprintf(fp, "Number of steps for each evolution: %d\n", param->d_J_steps);
+                        fprintf(fp, "Number of MC steps between evolutions: %d\n", param->d_J_relax);
+                        fprintf(fp, "Conf normalized before each evolution");
+                }
+                else
+                {
+                        if (param->d_N_replica_pt==1) fprintf(fp, "Number of standard local updating steps: %d\n", param->d_MC_step);
+                        else fprintf(fp, "Number of parallel tempering steps: %d\n", param->d_MC_step);
+                        fprintf(fp, "Measures taken every: %d\n", param->d_measevery);
+                        fprintf(fp, "Conf normalized every: %d\n", param->d_num_norm);
+                        fprintf(fp, "Conf saved every: %d\n", param->d_saveconf_backup_every);
+                }
+                fprintf(fp, "Over-relaxation/over-heat-bath ratio: %d / 1\n", param->d_num_micro);
+                fprintf(fp, "\n");
 
 		fprintf(fp, "Max num of cooling steps: %d\n", param->d_coolsteps);
 		fprintf(fp, "Topo obs measured every %d cooling steps\n", param->d_coolevery);
