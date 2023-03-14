@@ -46,8 +46,8 @@ void real_main(char *input_file_name)
 	// initialize geometry
 	init_geometry(&geo, &param);
 
-	// initialize lattice replicas
-	init_CPN_replicas(&conf, &param, &rng_state);
+	// initialize lattice
+	init_single_CPN_replica(&conf, &param, &rng_state);
 
 	// initialize aux conf (will be used for cooling and for periodic conf translations)
 	allocate_CPN_conf(&aux_conf, &param);

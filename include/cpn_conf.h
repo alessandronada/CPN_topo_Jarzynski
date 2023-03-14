@@ -34,6 +34,7 @@ typedef struct Acc_Swap {
 
 // in lib/cpn_conf_def.c
 void init_CPN_replicas(CPN_Conf **, CPN_Param const * const, RNG_Param *);
+void init_single_CPN_replica(CPN_Conf **, CPN_Param const * const, RNG_Param *);
 void allocate_CPN_conf(CPN_Conf *, CPN_Param const * const);
 void init_CPN_conf(CPN_Conf *, CPN_Param const * const, char const * const, RNG_Param *); 
 void init_bound_cond(CPN_Conf *, int const, CPN_Param const * const);
