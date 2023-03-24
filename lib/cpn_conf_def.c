@@ -48,7 +48,7 @@ void init_single_CPN_replica(CPN_Conf **conf, CPN_Param const * const param, RNG
 	int i=0, err;
 	char conf_file_name[STD_STRING_LENGTH];
 	strcpy(conf_file_name, param->d_conf_file); // conf_file_name = param->d_conf_file
-
+        
 	// allocate the vector to store replicas
 	err=posix_memalign((void **) conf, (size_t) DOUBLE_ALIGN, (size_t) param->d_N_replica_pt * sizeof(CPN_Conf));
 	if(err!=0)
@@ -56,10 +56,9 @@ void init_single_CPN_replica(CPN_Conf **conf, CPN_Param const * const param, RNG
 		fprintf(stderr, "Problems in allocating the Jarzynski replica! (%s, %d)\n", __FILE__, __LINE__);
 		exit(EXIT_FAILURE);
 	}
-
 	allocate_CPN_conf(&((*conf)[i]),param); // allocate memory to store CPN conf
 	init_CPN_conf(&((*conf)[i]), param, conf_file_name, rng_state); // initialize CPN conf
-	set_bound_cond(&((*conf)[i]),0.0,param); // initialize open boundary conditions parameters
+	init_single_replica_bound_cond(&((*conf)[i]),0.0,param); // initialize open boundary conditions parameters
 	((*conf)[i]).conf_label=i;
 }
 
@@ -169,12 +168,47 @@ void init_bound_cond(CPN_Conf *conf, int const a, CPN_Param const * const param)
 	}
 }
 
+void init_single_replica_bound_cond(CPN_Conf *conf, double const newC, CPN_Param const * const param)
+{
+	int err, mu;
+	long i;
+
+	//allocation of C[i][mu]
+	err=posix_memalign((void**) &(conf->C), (size_t) DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double *));
+	if(err!=0)
+	{
+		fprintf(stderr, "Problems in allocating the defect!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	for(i=0; i<param->d_volume; i++)
+	{
+		err=posix_memalign((void**) &(conf->C[i]), (size_t) DOUBLE_ALIGN, (size_t) 2 * sizeof(double));
+		if(err!=0)
+		{
+			fprintf(stderr, "Problems in allocating the defect!\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	//initialization of C[r][mu]
+	for(i=0; i<param->d_volume; i++)
+	{
+		for(mu=0; mu<2; mu++)
+		{
+			conf->C[i][mu]=1.0;
+			// defect affects link along the mu=0 direction being set along the mu=1 direction
+			if ( (mu==0) && (is_on_defect(i, param) == 0) )
+				conf->C[i][mu] = newC;
+		}
+	}
+}
+
 // change of the defect
 void set_bound_cond(CPN_Conf *conf, double const newC, CPN_Param const * const param)
 {
 	int mu;
 	long i;
-
 	//change of C[r][mu]
 	for(i=0; i<param->d_volume; i++)
 	{

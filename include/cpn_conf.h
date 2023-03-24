@@ -38,6 +38,7 @@ void init_single_CPN_replica(CPN_Conf **, CPN_Param const * const, RNG_Param *);
 void allocate_CPN_conf(CPN_Conf *, CPN_Param const * const);
 void init_CPN_conf(CPN_Conf *, CPN_Param const * const, char const * const, RNG_Param *); 
 void init_bound_cond(CPN_Conf *, int const, CPN_Param const * const);
+void init_single_replica_bound_cond(CPN_Conf *, double const, CPN_Param const * const);
 void set_bound_cond(CPN_Conf *, double const, CPN_Param const * const);
 int is_on_defect(long const, CPN_Param const * const);
 void normalize_replicas(CPN_Conf *, CPN_Param const * const); 
