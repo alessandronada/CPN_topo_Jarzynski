@@ -40,6 +40,7 @@ typedef struct CPN_Param {
 	int d_measevery;		// number of updating steps between two measures
 	int d_num_micro;		// number of over-relaxionation updating steps (microcanincal steps) for every over-heat-bath updating step
 	int d_num_norm;			// normalize the configuration every d_num_norm updating steps
+	int d_therm;                    // number of thermalization updating steps
 	
 	// initialization and saving
 	int d_start;					// initialize conf: 0 random cold, 1 random hot, 2 read conf from file

@@ -60,6 +60,12 @@ void real_main(char *input_file_name)
  	// Monte Carlo begins
 	time(&start_date);
 	start_time=clock();
+        
+        for (i=0; i<param.d_therm; i++)  
+	{
+            single_conf_hierarchic_update(conf, most_update, &param, &geo, &rng_state);
+        }
+        
 	for (i=0; i<param.d_J_evolutions; i++)  
 	{
                 // updates between starting configurations of evolutions
