@@ -63,7 +63,8 @@ void real_main(char *input_file_name)
         
         for (i=0; i<param.d_therm; i++)  
 	{
-            single_conf_hierarchic_update(conf, most_update, &param, &geo, &rng_state);
+            update_with_defect(conf, &geo, &param, &rng_state);
+            if ( (conf[0].update_index) % param.d_num_norm == 0) normalize_replicas(conf,&param);
         }
         
 	for (i=0; i<param.d_J_evolutions; i++)  

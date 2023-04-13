@@ -654,7 +654,7 @@ void print_simulation_details_cpn(char const * const input_file_name, CPN_Param 
                         fprintf(fp, "Number of non-equilbrium evolutions: %d\n", param->d_J_evolutions);
                         fprintf(fp, "Number of steps for each evolution: %d\n", param->d_J_steps);
                         fprintf(fp, "Number of MC steps between evolutions: %d\n", param->d_J_relax);
-                        fprintf(fp, "Conf normalized before each evolution");
+                        fprintf(fp, "Conf normalized before each evolution and (during thermalization) every: %d\n", param->d_num_norm);
                 }
                 else
                 {
@@ -664,6 +664,7 @@ void print_simulation_details_cpn(char const * const input_file_name, CPN_Param 
                         fprintf(fp, "Conf normalized every: %d\n", param->d_num_norm);
                         fprintf(fp, "Conf saved every: %d\n", param->d_saveconf_backup_every);
                 }
+                fprintf(fp, "Thermalization steps: %d\n", param->d_therm);
                 fprintf(fp, "Over-relaxation/over-heat-bath ratio: %d / 1\n", param->d_num_micro);
                 fprintf(fp, "\n");
 
