@@ -69,6 +69,7 @@ void real_main(char *input_file_name)
         
 	for (i=0; i<param.d_J_evolutions; i++)  
 	{
+                set_bound_cond(conf, 0.0, &param);
                 // updates between starting configurations of evolutions
                 for (j=0; j<param.d_J_relax; j++)
                 {
