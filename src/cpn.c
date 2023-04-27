@@ -26,7 +26,7 @@ void real_main(char *input_file_name)
 	time_t start_date, finish_date;
 	clock_t start_time, finish_time;
 	FILE *datafilep, *swaptrackfilep, *topofilep;
-	int i;
+	int i,j;
 
 	// read input file
 	read_input(input_file_name, &param);
@@ -64,9 +64,9 @@ void real_main(char *input_file_name)
 
         for (i=0; i<param.d_therm; i++)
         {
-            for(i=0; i<param.d_N_replica_pt; i++)
-                update_with_defect(&(conf[i]), &geo, &param, &rng_state);
-
+            for(j=0; j<param.d_N_replica_pt; j++)
+                update_with_defect(&(conf[j]), &geo, &param, &rng_state);
+            
             if ( (conf[0].update_index) % param.d_num_norm == 0) normalize_replicas(conf,&param);
         }
 
