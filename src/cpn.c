@@ -61,6 +61,15 @@ void real_main(char *input_file_name)
  	// Monte Carlo begins
 	time(&start_date);
 	start_time=clock();
+
+        for (i=0; i<param.d_therm; i++)
+        {
+            for(i=0; i<param.d_N_replica_pt; i++)
+                update_with_defect(&(conf[i]), &geo, &param, &rng_state);
+
+            if ( (conf[0].update_index) % param.d_num_norm == 0) normalize_replicas(conf,&param);
+        }
+
 	for (i=0; i<param.d_MC_step; i++)  
 	{
 		// perform a single step of parallel tempering with hierarchic updates and print state of replica swap

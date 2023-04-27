@@ -158,7 +158,7 @@ void read_input(char const * const input_file_name, CPN_Param *param)
 				}
 				param->d_measevery=temp_i;
 			}
-			else if(strncmp(str, "therm", 10)==0)
+			else if(strncmp(str, "therm", 5)==0)
 			{ 
 				err=fscanf(input_fp, "%d", &temp_i);
 				if(err!=1)
