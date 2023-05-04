@@ -64,8 +64,7 @@ void real_main(char *input_file_name)
 
         for (i=0; i<param.d_therm; i++)
         {
-            for(j=0; j<param.d_N_replica_pt; j++)
-                update_with_defect(&(conf[j]), &geo, &param, &rng_state);
+            parallel_tempering_with_hierarchic_update(conf, most_update, &swap_counter, &param, &geo, &aux_conf, &rng_state);
             
             if ( (conf[0].update_index) % param.d_num_norm == 0) normalize_replicas(conf,&param);
         }

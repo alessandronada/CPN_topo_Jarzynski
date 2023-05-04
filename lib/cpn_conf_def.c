@@ -45,7 +45,7 @@ void init_CPN_replicas(CPN_Conf **conf, CPN_Param const * const param, RNG_Param
 // allocate single replica for Jarzynski
 void init_single_CPN_replica(CPN_Conf **conf, CPN_Param const * const param, RNG_Param *rng_state)
 {
-	int i=0, err;
+	int err;
 	char conf_file_name[STD_STRING_LENGTH];
 	strcpy(conf_file_name, param->d_conf_file); // conf_file_name = param->d_conf_file
         
@@ -56,10 +56,10 @@ void init_single_CPN_replica(CPN_Conf **conf, CPN_Param const * const param, RNG
 		fprintf(stderr, "Problems in allocating the Jarzynski replica! (%s, %d)\n", __FILE__, __LINE__);
 		exit(EXIT_FAILURE);
 	}
-	allocate_CPN_conf(&((*conf)[i]),param); // allocate memory to store CPN conf
-	init_CPN_conf(&((*conf)[i]), param, conf_file_name, rng_state); // initialize CPN conf
-	init_single_replica_bound_cond(&((*conf)[i]),0.0,param); // initialize open boundary conditions parameters
-	((*conf)[i]).conf_label=i;
+	allocate_CPN_conf(&((*conf)[0]),param); // allocate memory to store CPN conf
+	init_CPN_conf(&((*conf)[0]), param, conf_file_name, rng_state); // initialize CPN conf
+	init_single_replica_bound_cond(&((*conf)[0]), 0.0, param); // initialize open boundary conditions parameters
+	((*conf)[0]).conf_label=0;
 }
 
 // allocate memory for a CPN conf

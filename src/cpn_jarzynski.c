@@ -63,60 +63,62 @@ void real_main(char *input_file_name)
         
         for (i=0; i<param.d_therm; i++)  
 	{
-            update_with_defect(conf, &geo, &param, &rng_state);
-            if ( (conf[0].update_index) % param.d_num_norm == 0) normalize_replicas(conf,&param);
+            single_conf_hierarchic_update(&(conf[0]), most_update, &param, &geo, &rng_state);
+            
+            if ( i % param.d_num_norm == 0) normalize_replicas(conf, &param);
         }
         
+        deltaC = ((double)(1))/((double)(param.d_J_steps));
 	for (i=0; i<param.d_J_evolutions; i++)  
 	{
-                set_bound_cond(conf, 0.0, &param);
-                // updates between starting configurations of evolutions
-                for (j=0; j<param.d_J_relax; j++)
-                {
-                    single_conf_hierarchic_update(conf, most_update, &param, &geo, &rng_state);
-                }
+            W=0.0;
+            newC=0.0;
                 
-                // normalize the lattice fields of all replicas
-                normalize_replicas(conf, &param);
+            set_bound_cond(&(conf[0]), newC, &param);
                 
-                // store the starting configuration of the evolution
-                copyconf(conf, &param, &start_conf);
+            // updates between starting configurations of evolutions
+            for (j=0; j<param.d_J_relax; j++)
+            {
+                single_conf_hierarchic_update(&(conf[0]), most_update, &param, &geo, &rng_state);
+            }
+            
+            // normalize the lattice fields of all replicas
+            normalize_replicas(conf, &param);
                 
-                W=0.0;
-                newC=0.0;
-                for (j=0; j<param.d_J_steps; j++)
-                {
-                    //change bc on defect
-                    newC = ((double)(j+1))/((double)(param.d_J_steps));
-                    set_bound_cond(conf, newC, &param);
-                    deltaC = ((double)(1))/((double)(param.d_J_steps));
-                    //compute work
-                    W += compute_W(conf, &param, 0, deltaC);
-                    
-                    // perform a single step of hierarchic updates with new defect
-                    single_conf_hierarchic_update(conf, most_update, &param, &geo, &rng_state);
-                }
+            // store the starting configuration of the evolution
+            copyconf(&(conf[0]), &param, &start_conf);
                 
-                // increase counter of evolutions
-                conf[0].update_index++;
+            for (j=0; j<param.d_J_steps; j++)
+            {
+                //change bc on defect
+                newC += deltaC;
+                set_bound_cond(&(conf[0]), newC, &param);
+                //compute work
+                W += compute_W(conf, &param, 0, deltaC);
+                // perform a single step of hierarchic updates with new defect
+                single_conf_hierarchic_update(&(conf[0]), most_update, &param, &geo, &rng_state);
+            }
                 
-                // perform measures
-                perform_measures_localobs(&(conf[0]), &geo, &param, datafilep, topofilep, &aux_conf);
-                print_work(&(conf[0]), W, workfilep);
-
-                // recover starting conf
-                copyconf(&start_conf, &param, conf);
-		
-		// save current configurations and backup copies
-// 		if ( param.d_saveconf_backup_every != 0 )
+            // increase counter of evolutions
+            conf[0].update_index++;
+                
+            // perform measures
+            perform_measures_localobs(&(conf[0]), &geo, &param, datafilep, topofilep, &aux_conf);
+            print_work(&(conf[0]), W, workfilep);
+                
+            // recover starting conf
+            copyconf(&start_conf, &param, &(conf[0]));
+	
+	    // save current configurations and backup copies
+// 	    if ( param.d_saveconf_backup_every != 0 )
+// 	    {
+//      	if ( i % param.d_saveconf_backup_every == 0)
 // 		{
-// 			if ( i % param.d_saveconf_backup_every == 0)
-// 			{
-// 				write_replicas(conf, &param);
-// 				write_replicas_backup(conf, &param);
-// 				write_rng_state(&rng_state, &param);
-// 			}
-//                 }
+// 		    write_replicas(conf, &param);
+// 		    write_replicas_backup(conf, &param);
+// 		    write_rng_state(&rng_state, &param);
+// 		}
+//          }
 	}
 
 	// Monte Carlo ends
