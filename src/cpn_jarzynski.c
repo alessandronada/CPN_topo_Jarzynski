@@ -26,7 +26,7 @@ void real_main(char *input_file_name)
 	clock_t start_time, finish_time;
 	FILE *datafilep, *topofilep, *workfilep;
 	int i,j;
-        double W=0.0, deltaC=0.0, newC=0.0;
+        double W=0.0, newC=0.0, oldC=0.0;
 
 	// read input file
 	read_input(input_file_name, &param);
@@ -61,6 +61,19 @@ void real_main(char *input_file_name)
 	time(&start_date);
 	start_time=clock();
         
+        double w[param.d_J_steps];
+        double deltaClin = ((double)(1))/((double)(param.d_J_steps));
+        double protocolC[param.d_J_steps];
+        
+        if (param.d_J_protocol != 0)
+            read_protocol_file(protocolC);
+        else
+            for (j=0; j<param.d_J_steps; j++)
+                protocolC[j] = deltaClin * (j+1);
+        
+        for (j=0; j<param.d_J_steps; j++)
+            w[j]=0.0;
+        
         for (i=0; i<param.d_therm; i++)  
 	{
             single_conf_hierarchic_update(&(conf[0]), most_update, &param, &geo, &rng_state);
@@ -68,11 +81,12 @@ void real_main(char *input_file_name)
             if ( i % param.d_num_norm == 0) normalize_replicas(conf, &param);
         }
         
-        deltaC = ((double)(1))/((double)(param.d_J_steps));
+        
 	for (i=0; i<param.d_J_evolutions; i++)  
 	{
             W=0.0;
             newC=0.0;
+            oldC=0.0;
                 
             set_bound_cond(&(conf[0]), newC, &param);
                 
@@ -91,10 +105,13 @@ void real_main(char *input_file_name)
             for (j=0; j<param.d_J_steps; j++)
             {
                 //change bc on defect
-                newC += deltaC;
+                oldC = newC;
+                newC = protocolC[j];
+                fprintf(stdout, "%.10lf \n", newC);
                 set_bound_cond(&(conf[0]), newC, &param);
                 //compute work
-                W += compute_W(conf, &param, 0, deltaC);
+                W += compute_W(conf, &param, 0, newC - oldC);
+                w[j] += W;
                 // perform a single step of hierarchic updates with new defect
                 single_conf_hierarchic_update(&(conf[0]), most_update, &param, &geo, &rng_state);
             }
@@ -120,6 +137,9 @@ void real_main(char *input_file_name)
 // 		}
 //          }
 	}
+	
+	for (j=0; j<param.d_J_steps; j++)
+            fprintf(stdout, "%d %.10lf \n", j, w[j]/param.d_J_evolutions);
 
 	// Monte Carlo ends
 	time(&finish_date);

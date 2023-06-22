@@ -27,6 +27,7 @@ typedef struct CPN_Param {
 	int d_J_evolutions;             // number of non-equilibrium evolutions
 	int d_J_steps;                  // number of intermediate steps in non-equilibrium evolution
 	int d_J_relax;                    // number of updates between two non-equilibrium evolutions
+	int d_J_protocol;              // use custom protocol
 	
 	// hierarchical update (parallel tempering)
 	int d_N_hierarc_levels;	// number of hierarchical levels
@@ -86,6 +87,7 @@ void free_param(CPN_Param *);
 void init_data_file(FILE **, CPN_Param const * const);
 void init_topo_file(FILE **, CPN_Param const * const);
 void init_work_file(FILE **, CPN_Param const * const);
+void read_protocol_file(double *protocolC);
 void print_simulation_details_cpn(char const * const, CPN_Param const * const, time_t const * const, time_t const * const, clock_t const, clock_t const);
 void print_simulation_details_multicanonic_cpn(char const * const, CPN_Param const * const, time_t const * const, time_t const * const, clock_t const, clock_t const);
 

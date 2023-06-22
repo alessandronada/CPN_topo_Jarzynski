@@ -4,23 +4,24 @@ beta   0.7      # bare inverse coupling
 theta  0.0      # bare imaginary theta
 
 # simulation details
-num_MC_step      100    # number of updating steps (unused for Jarzynski)
-meas_every       10     # perform measures every <meas_every> steps  (unused for Jarzynski)
+num_MC_step      1000    # number of updating steps (unused for Jarzynski)
+meas_every       1     # perform measures every <meas_every> steps  (unused for Jarzynski)
 therm		 1000   # thermalization steps
 num_micro        4      # number of over-relaxation steps (microcanonical steps) for every over-heat-bath step
 num_norm         3      # normalize fields every <num_norm> steps
 save_conf_every  50     # save conf for backup every <save_conf_every> steps
 
-num_Jar_ev       100    # number of non-equilibrium evolutions (Jarzynski only)
-num_Jar_steps    10     # number of non-equilibrium steps in each evolution (Jarzynski only)
+num_Jar_ev       10    # number of non-equilibrium evolutions (Jarzynski only)
+num_Jar_steps    100     # number of non-equilibrium steps in each evolution (Jarzynski only)
 num_Jar_relax    1      # number of MC steps between non-equilibrium evolutions (Jarzynski only)
+protocol_Jar     1
 
 start 0                 # initialize conf: 0=random cold, 1=random hot, 2=start from saved conf
 
-num_cool_step    50     # number of cooling steps 
+num_cool_step    10     # number of cooling steps 
 meas_cool_every  5      # perform measures every <meas_cool_every> cool steps
 
-rng_seed  42            # rng seed
+rng_seed  425            # rng seed
 rng_start 0             # initialize rng state: 0=std initialization, 1=read rng state from file
 
 # Hasenbusch parallel tempering parameters

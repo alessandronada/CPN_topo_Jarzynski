@@ -198,6 +198,16 @@ void read_input(char const * const input_file_name, CPN_Param *param)
 				}
 				param->d_J_relax=temp_i;
 			}
+			else if(strncmp(str, "protocol_Jar", 12)==0)
+			{ 
+				err=fscanf(input_fp, "%d", &temp_i);
+				if(err!=1)
+				{
+					fprintf(stderr, "Error in reading the file %s (%s, %d)\n", input_file_name, __FILE__, __LINE__);
+					exit(EXIT_FAILURE);
+				}
+				param->d_J_protocol=temp_i;
+			}
 			else if(strncmp(str, "num_micro", 9)==0)
 			{ 
 				err=fscanf(input_fp, "%d", &temp_i);
@@ -601,6 +611,28 @@ void init_work_file(FILE **workfilep, CPN_Param const * const param)
 		fprintf(*workfilep, "\n");
 	}
 	fflush(*workfilep);
+}
+
+void read_protocol_file(double *protocolC)
+{ 
+        FILE * fp;
+        double c, i;
+        int j;
+        
+        fp = fopen("protocol", "r");
+        i = fscanf(fp, "%lf", &c);
+        j=0;
+        while (i != EOF)
+        {
+            protocolC[j] = c;
+            printf("%lf %d \n", protocolC[j], j);
+            i = fscanf(fp, "%lf", &c);
+            j++;
+        }
+
+        fclose(fp);
+        
+        return;
 }
 
 // print simulations details of cpn
