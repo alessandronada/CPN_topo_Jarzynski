@@ -24,7 +24,7 @@ void real_main(char *input_file_name)
 	RNG_Param rng_state;
 	time_t start_date, finish_date;
 	clock_t start_time, finish_time;
-	FILE *datafilep, *topofilep, *workfilep;
+	FILE *datafilep, *topofilep, *workfilep, *intworkfilep;
 	int i,j;
         double W=0.0, newC=0.0, oldC=0.0;
 
@@ -42,6 +42,7 @@ void real_main(char *input_file_name)
         
 	// open work data file
 	init_work_file(&workfilep, &param);
+        init_intermediate_work_file(&intworkfilep, &param);
 
 	// initialize geometry
 	init_geometry(&geo, &param);
@@ -71,9 +72,6 @@ void real_main(char *input_file_name)
             for (j=0; j<param.d_J_steps; j++)
                 protocolC[j] = deltaClin * (j+1);
         
-        for (j=0; j<param.d_J_steps; j++)
-            w[j]=0.0;
-        
         for (i=0; i<param.d_therm; i++)  
 	{
             single_conf_hierarchic_update(&(conf[0]), most_update, &param, &geo, &rng_state);
@@ -87,6 +85,8 @@ void real_main(char *input_file_name)
             W=0.0;
             newC=0.0;
             oldC=0.0;
+            for (j=0; j<param.d_J_steps; j++)
+                w[j]=0.0;
                 
             set_bound_cond(&(conf[0]), newC, &param);
                 
@@ -107,11 +107,10 @@ void real_main(char *input_file_name)
                 //change bc on defect
                 oldC = newC;
                 newC = protocolC[j];
-                fprintf(stdout, "%.10lf \n", newC);
                 set_bound_cond(&(conf[0]), newC, &param);
                 //compute work
                 W += compute_W(conf, &param, 0, newC - oldC);
-                w[j] += W;
+                w[j] = W;
                 // perform a single step of hierarchic updates with new defect
                 single_conf_hierarchic_update(&(conf[0]), most_update, &param, &geo, &rng_state);
             }
@@ -121,7 +120,8 @@ void real_main(char *input_file_name)
                 
             // perform measures
             perform_measures_localobs(&(conf[0]), &geo, &param, datafilep, topofilep, &aux_conf);
-            print_work(&(conf[0]), W, workfilep);
+            print_work(i, W, workfilep);
+            print_intermediate_work(i, param.d_J_steps, w, intworkfilep);
                 
             // recover starting conf
             copyconf(&start_conf, &param, &(conf[0]));
@@ -137,9 +137,6 @@ void real_main(char *input_file_name)
 // 		}
 //          }
 	}
-	
-	for (j=0; j<param.d_J_steps; j++)
-            fprintf(stdout, "%d %.10lf \n", j, w[j]/param.d_J_evolutions);
 
 	// Monte Carlo ends
 	time(&finish_date);

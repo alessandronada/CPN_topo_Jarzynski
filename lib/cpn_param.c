@@ -308,6 +308,16 @@ void read_input(char const * const input_file_name, CPN_Param *param)
 				}
 				strcpy(param->d_work_file, temp_str);
 			}
+			else if(strncmp(str, "intwork_file", 12)==0)
+			{ 
+				err=fscanf(input_fp, "%s", temp_str);
+				if(err!=1)
+				{
+					fprintf(stderr, "Error in reading the file %s (%s, %d)\n", input_file_name, __FILE__, __LINE__);
+					exit(EXIT_FAILURE);
+				}
+				strcpy(param->d_intwork_file, temp_str);
+			}
 			else if(strncmp(str, "log_file", 8)==0)
 			{ 
 				err=fscanf(input_fp, "%s", temp_str);
@@ -611,6 +621,26 @@ void init_work_file(FILE **workfilep, CPN_Param const * const param)
 		fprintf(*workfilep, "\n");
 	}
 	fflush(*workfilep);
+}
+
+// initialize work data file
+void init_intermediate_work_file(FILE **intworkfilep, CPN_Param const * const param)
+{ 
+	*intworkfilep=fopen(param->d_intwork_file, "r");
+	if(*intworkfilep!=NULL) // file exists
+	{
+		fclose(*intworkfilep);
+		*intworkfilep=fopen(param->d_intwork_file, "a");
+	}
+	else
+	{
+		int mu;
+		*intworkfilep=fopen(param->d_intwork_file, "w");
+		fprintf(*intworkfilep, "# %f ", param->d_beta);
+		for(mu=0; mu<2; mu++) fprintf(*intworkfilep, "%d ", param->d_size[mu]);
+		fprintf(*intworkfilep, "\n");
+	}
+	fflush(*intworkfilep);
 }
 
 void read_protocol_file(double *protocolC)
