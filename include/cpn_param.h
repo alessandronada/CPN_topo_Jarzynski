@@ -89,7 +89,7 @@ void init_data_file(FILE **, CPN_Param const * const);
 void init_topo_file(FILE **, CPN_Param const * const);
 void init_work_file(FILE **, CPN_Param const * const);
 void init_intermediate_work_file(FILE **, CPN_Param const * const);
-void read_protocol_file(double *protocolC);
+void read_protocol_file(char const * const protocol_file_name, double *protocolC);
 void print_simulation_details_cpn(char const * const, CPN_Param const * const, time_t const * const, time_t const * const, clock_t const, clock_t const);
 void print_simulation_details_multicanonic_cpn(char const * const, CPN_Param const * const, time_t const * const, time_t const * const, clock_t const, clock_t const);
 

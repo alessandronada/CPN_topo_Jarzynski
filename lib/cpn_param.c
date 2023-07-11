@@ -643,13 +643,13 @@ void init_intermediate_work_file(FILE **intworkfilep, CPN_Param const * const pa
 	fflush(*intworkfilep);
 }
 
-void read_protocol_file(double *protocolC)
+void read_protocol_file(char const * const protocol_file_name, double *protocolC)
 { 
         FILE * fp;
         double c, i;
         int j;
         
-        fp = fopen("protocol", "r");
+        fp = fopen(protocol_file_name, "r");
         i = fscanf(fp, "%lf", &c);
         j=0;
         while (i != EOF)

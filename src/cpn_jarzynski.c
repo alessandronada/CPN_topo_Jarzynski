@@ -14,7 +14,7 @@
 #include<time.h>
 #include<string.h>
 
-void real_main(char *input_file_name) 
+void real_main(char *input_file_name, char *protocol_file_name) 
 {
 	CPN_Conf *conf;
 	CPN_Conf aux_conf, start_conf;
@@ -67,7 +67,7 @@ void real_main(char *input_file_name)
         double protocolC[param.d_J_steps];
         
         if (param.d_J_protocol != 0)
-            read_protocol_file(protocolC);
+            read_protocol_file(protocol_file_name, protocolC);
         else
             for (j=0; j<param.d_J_steps; j++)
                 protocolC[j] = deltaClin * (j+1);
@@ -174,8 +174,8 @@ void real_main(char *input_file_name)
 
 int main (int argc, char **argv)
 {
-	char input_file_name[STD_STRING_LENGTH];
-	if(argc != 2)
+	char input_file_name[STD_STRING_LENGTH], protocol_file_name[STD_STRING_LENGTH];
+	if(argc != 3)
 	{
 		printf("\n");
 		printf("__________________________________________________________________________________________________________________________________\n");
@@ -200,7 +200,7 @@ int main (int argc, char **argv)
 		printf("Compiled from main %s\n", __FILE__);
 		printf("Description: lattice simulations of 2d CP^{N-1} models topology via parallel tempering\n\n");
 		printf("Author: Claudio Bonanno\n");
-		printf("Other contributors: Mario Berni, Davide Vadacchino\n");
+		printf("Other contributors: Mario Berni, Alessandro Nada, Davide Vadacchino\n");
 		printf("Bug report: %s\n", PACKAGE_BUGREPORT);
 		printf("\nCompiled with N = %i\n", N);
 		#ifdef __INTEL_COMPILER
@@ -208,7 +208,7 @@ int main (int argc, char **argv)
 		#elif defined( __GNUC__ )
 		printf("Compiled with gcc %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 		#endif
-		printf("Usage: %s input_file \n", argv[0]);
+		printf("Usage: %s input_file protocol_file \n", argv[0]);
 		return(EXIT_FAILURE);
 	}
 	else
@@ -221,7 +221,8 @@ int main (int argc, char **argv)
 		else
 		{
 			strcpy(input_file_name, argv[1]);
-			real_main(input_file_name);
+                        strcpy(protocol_file_name, argv[2]);
+			real_main(input_file_name, protocol_file_name);
 			return(EXIT_SUCCESS);
 		}
 	}
